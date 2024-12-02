@@ -7,11 +7,7 @@ export const signupSchema = z.object({
 export type SignupInput = z.infer<typeof signupSchema>;
 
 export const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email."),
-  password: z
-    .string()
-    .min(8, "Password is too short. Minimum 8 characters required.")
-    .max(255),
+  email: z.string().email("Por favor entre com um email válido."),
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 

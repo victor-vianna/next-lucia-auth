@@ -16,53 +16,41 @@ export function Login() {
   const [state, formAction] = useFormState(login, null);
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md bg-gray-300">
       <CardHeader className="text-center">
-        <CardTitle>{APP_TITLE} Log In</CardTitle>
-        <CardDescription>Log in to your account to access your dashboard</CardDescription>
+        <CardTitle>{APP_TITLE} Test</CardTitle>
+        <CardDescription>Faça login para ter acesso ao dashboard</CardDescription>
       </CardHeader>
       <CardContent>
-        <Button variant="outline" className="w-full" asChild>
+        {/* <Button variant="outline" className="w-full" asChild>
           <Link href="/login/discord" prefetch={false}>
             <DiscordLogoIcon className="mr-2 h-5 w-5" />
             Log in with Discord
           </Link>
-        </Button>
-        <div className="my-2 flex items-center">
+        </Button> */}
+        {/* <div className="my-2 flex items-center">
           <div className="flex-grow border-t border-muted" />
           <div className="mx-2 text-muted-foreground">or</div>
           <div className="flex-grow border-t border-muted" />
-        </div>
+        </div> */}
         <form action={formAction} className="grid gap-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               required
               id="email"
-              placeholder="email@example.com"
+              placeholder="email@exemplo.com"
               autoComplete="email"
               name="email"
               type="email"
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <PasswordInput
-              id="password"
-              name="password"
-              required
-              autoComplete="current-password"
-              placeholder="********"
-            />
-          </div>
-
           <div className="flex flex-wrap justify-between">
             <Button variant={"link"} size={"sm"} className="p-0" asChild>
-              <Link href={"/signup"}>Not signed up? Sign up now.</Link>
+              <Link href={"/signup"}>Não se inscreveu? Inscreva-se.</Link>
             </Button>
             <Button variant={"link"} size={"sm"} className="p-0" asChild>
-              <Link href={"/reset-password"}>Forgot password?</Link>
+              <Link href={"/reset-password"}>Esqueceu a senha?</Link>
             </Button>
           </div>
 
@@ -80,10 +68,10 @@ export function Login() {
             </p>
           ) : null}
           <SubmitButton className="w-full" aria-label="submit-btn">
-            Log In
+            Iniciar sessão
           </SubmitButton>
           <Button variant="outline" className="w-full" asChild>
-            <Link href="/">Cancel</Link>
+            <Link href="/">Cancelar</Link>
           </Button>
         </form>
       </CardContent>

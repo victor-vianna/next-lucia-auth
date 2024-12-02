@@ -23,6 +23,7 @@ import { sendMail, EmailTemplate } from "@/lib/email";
 import { validateRequest } from "@/lib/auth/validate-request";
 import { Paths } from "../constants";
 import { env } from "@/env";
+import { resend } from "../services/email";
 
 export interface ActionResponse<T> {
   fieldError?: Partial<Record<keyof T, string | undefined>>;
@@ -38,34 +39,57 @@ export async function login(_: any, formData: FormData): Promise<ActionResponse<
     return {
       fieldError: {
         email: err.fieldErrors.email?.[0],
-        password: err.fieldErrors.password?.[0],
+        // password: err.fieldErrors.password?.[0],
       },
     };
   }
 
-  const { email, password } = parsed.data;
+  const { email } = parsed.data;
 
   const existingUser = await db.query.users.findFirst({
     where: (table, { eq }) => eq(table.email, email),
   });
 
-  if (!existingUser || !existingUser?.hashedPassword) {
+  if (!existingUser) {
     return {
-      formError: "Incorrect email or password",
+      formError: "Email ou senha incorreta",
     };
   }
+  // Gerar código aleatório
 
-  const validPassword = await new Scrypt().verify(existingUser.hashedPassword, password);
-  if (!validPassword) {
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Definir a validade do código
+
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+
+  // Inserir código no banco de dados
+
+  const insertVerificationResponse = await db
+    .insert(emailVerificationCodes)
+    .values({
+      userId: existingUser.id,
+      email,
+      code,
+      expiresAt,
+    })
+    .returning({ insertedId: emailVerificationCodes.id });
+  const insertedId = insertVerificationResponse[0]?.insertedId;
+  if (!insertedId) {
     return {
-      formError: "Incorrect email or password",
+      formError: "Oops,  houve um erro ao criar código de verificação.",
     };
   }
+  // Enviar email com resend
 
-  const session = await lucia.createSession(existingUser.id, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
-  cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-  return redirect(Paths.Dashboard);
+  const resendResponse = await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: email,
+    subject: "Seu código de verificação",
+    html: `<p>Seu código de verificação é <strong>${code}</strong>. Ele expira em 10 minutos.</p>`,
+  });
+  console.log(resendResponse);
+  redirect(`/verify-email/${insertedId}`);
 }
 
 export async function signup(_: any, formData: FormData): Promise<ActionResponse<SignupInput>> {
@@ -280,3 +304,49 @@ async function generatePasswordResetToken(userId: string): Promise<string> {
   });
   return tokenId;
 }
+
+// export async function sendVerificationCode(_: any, formData: FormData): Promise<ActionResponse<{}>> {
+
+//   const obj = Object.fromEntries(formData.entries()) // extrair os campos do formulário
+
+//   // Validar se o email foi enviado corretamente
+
+//   const email = obj.email?.toString().trim().toLowerCase();
+
+//   if (!email) return { fieldError: {email: "E-mail é obrigatório"}}
+
+//   // Buscar usuário no banco de dados
+
+//   const existingUser = await db.query.users.findFirst({
+//     where: (table, {eq}) => eq( table.email, email)
+//   })
+
+//   if (!existingUser) return { formError: "Usuário não encontrado" }
+
+//   // Gerar código aleatório
+
+//   const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+//   // Definir a validade do código
+
+//   const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutos
+
+//   // Inserir código no banco de dados
+
+//   await db.insert(emailVerificationCodes).values({
+//     userId: existingUser.id,
+//     email,
+//     code,
+//     expiresAt,
+//   })
+
+//   // Enviar email com resend
+
+//   await resend.emails.send({
+//     from: "noreply@email.com",
+//     to: email,
+//     subject: "Seu código de verificação",
+//     html: `<p>Seu código de verificação é <strong>${code}</strong>. Ele expira em 10 minutos.</p>`,
+//   })
+
+//   return { success: true };

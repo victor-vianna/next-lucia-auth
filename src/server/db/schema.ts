@@ -17,6 +17,7 @@ export const users = pgTable(
   {
     id: varchar("id", { length: 21 }).primaryKey(),
     discordId: varchar("discord_id", { length: 255 }).unique(),
+    name: text("name"),
     email: varchar("email", { length: 255 }).unique().notNull(),
     emailVerified: boolean("email_verified").default(false).notNull(),
     hashedPassword: varchar("hashed_password", { length: 255 }),
@@ -33,7 +34,9 @@ export const users = pgTable(
     discordIdx: index("user_discord_idx").on(t.discordId),
   }),
 );
-
+export const usersRelations = relations(users, ({ one, many }) => ({
+  emailVerifications: many(emailVerificationCodes),
+}));
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -52,8 +55,10 @@ export const sessions = pgTable(
 export const emailVerificationCodes = pgTable(
   "email_verification_codes",
   {
-    id: serial("id").primaryKey(),
-    userId: varchar("user_id", { length: 21 }).unique().notNull(),
+    id: varchar("id", { length: 255 })
+      .notNull()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: varchar("user_id", { length: 21 }).notNull(),
     email: varchar("email", { length: 255 }).notNull(),
     code: varchar("code", { length: 8 }).notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
@@ -61,6 +66,15 @@ export const emailVerificationCodes = pgTable(
   (t) => ({
     userIdx: index("verification_code_user_idx").on(t.userId),
     emailIdx: index("verification_code_email_idx").on(t.email),
+  }),
+);
+export const emailVerificationCodesRelations = relations(
+  emailVerificationCodes,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [emailVerificationCodes.userId],
+      references: [users.id],
+    }),
   }),
 );
 
