@@ -21,3 +21,9 @@ export const resetPasswordSchema = z.object({
   password: z.string().min(8, "Password is too short").max(255),
 });
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+export const verifyCodeSchema = z.object({
+  code: z.string({ required_error: "Código não informado." }),
+  verificationCodeId: z.string().uuid("ID de verificação inálido."),
+});
+export type TVerifyCodeInput = z.infer<typeof verifyCodeSchema>;

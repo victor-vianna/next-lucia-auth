@@ -16,7 +16,7 @@ export const env = createEnv({
       ),
     RESEND_API_KEY: z.string({
       required_error: "API KEY do Resend não informada.",
-      invalid_type_error: "Tipo não válido para a API KEY do Resend.",
+      invalid_type_error: "Tipo inválido para a API KEY do Resend.",
     }),
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     // MOCK_SEND_EMAIL: z.boolean().default(false),

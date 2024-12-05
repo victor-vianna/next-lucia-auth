@@ -3,6 +3,7 @@ import { type ReactNode } from "react";
 import { type Metadata } from "next";
 import { Header } from "./_components/header";
 import { Footer } from "./_components/footer";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: APP_TITLE,
@@ -16,6 +17,7 @@ function LandingPageLayout({ children }: { children: ReactNode }) {
       {children}
       <div className="h-20"></div>
       <Footer />
+      <Toaster />
     </>
   );
 }
