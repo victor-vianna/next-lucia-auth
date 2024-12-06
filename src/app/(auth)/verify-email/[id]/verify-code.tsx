@@ -1,6 +1,7 @@
 "use client";
 
 import { SubmitButton } from "@/components/submit-button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +9,14 @@ import { validateVerificationCode } from "@/lib/auth/actions";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useFormState } from "react-dom";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { toast, Toaster } from "sonner";
 
 function VerifyCodeComponent({ verificationCodeId }: { verificationCodeId: string }) {
   // Create a wrapper action that appends verificationCodeId to FormData
@@ -19,23 +28,37 @@ function VerifyCodeComponent({ verificationCodeId }: { verificationCodeId: strin
   const [state, dispatch] = useFormState(formAction, null);
 
   return (
-    <Card className="w-full max-w-md bg-gray-300">
-      <CardHeader className="text-center">
-        <CardTitle>Verificação de Email</CardTitle>
-        <CardDescription>Preencha o código enviado ao seu email para acessar.</CardDescription>
-      </CardHeader>
+    <Card className="w-full max-w-md bg-slate-100">
       <CardContent>
-        <form action={dispatch} className="grid gap-4">
+        <form action={dispatch} className="grid gap-8 p-4">
           <div className="space-y-2">
             <Label htmlFor="code">Código de Verificação</Label>
-            <Input
+            <InputOTP
               required
               id="code"
-              placeholder="XXXXXX"
               autoComplete="code"
               name="code"
               type="text"
-            />
+              maxLength={6}
+              pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+            {/* <Input
+              required
+              id="code"
+              placeholder="******"
+              autoComplete="code"
+              name="code"
+              type="text"
+            /> */}
           </div>
 
           {state?.fieldError ? (
@@ -51,10 +74,13 @@ function VerifyCodeComponent({ verificationCodeId }: { verificationCodeId: strin
               {state?.formError}
             </p>
           ) : null}
-          <SubmitButton className="w-full" aria-label="submit-btn">
+          <SubmitButton className="w-full hover:bg-slate-700" aria-label="submit-btn">
             Verificar Código
           </SubmitButton>
         </form>
+        <Button onClick={() => toast("Código reenviado!")} variant={"link"}>
+          Não recebi o código. Reenviar
+        </Button>
       </CardContent>
     </Card>
   );

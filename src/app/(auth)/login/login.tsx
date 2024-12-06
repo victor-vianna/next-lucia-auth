@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useFormState } from "react-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import { APP_TITLE } from "@/lib/constants";
 import { login } from "@/lib/auth/actions";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/submit-button";
+import { useFormState } from "react-dom";
 
 export function Login() {
   const [state, formAction] = useFormState(login, null);
@@ -18,7 +18,7 @@ export function Login() {
   return (
     <Card className="w-full max-w-md bg-gray-300">
       <CardHeader className="text-center">
-        <CardTitle>{APP_TITLE} Test</CardTitle>
+        <CardTitle>{APP_TITLE}</CardTitle>
         <CardDescription>Faça login para ter acesso ao dashboard</CardDescription>
       </CardHeader>
       <CardContent>
@@ -67,7 +67,7 @@ export function Login() {
               {state?.formError}
             </p>
           ) : null}
-          <SubmitButton className="w-full" aria-label="submit-btn">
+          <SubmitButton className="w-full hover:bg-slate-700 " aria-label="submit-btn">
             Iniciar sessão
           </SubmitButton>
           <Button variant="outline" className="w-full" asChild>

@@ -62,7 +62,7 @@ export async function login(_: any, formData: FormData): Promise<ActionResponse<
 
   // Definir a validade do código
 
-  const expiresAt = new Date(Date.now() + 100 * 60 * 1000); // 100 minutos
+  const expiresAt = new Date(Date.now() + 100 * 60 * 1000); // 10 minutos
 
   // Inserir código no banco de dados
 
